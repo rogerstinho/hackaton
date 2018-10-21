@@ -1,0 +1,274 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/front/layout/template.xhtml">
+
+    <ui:define name="head">
+        <title> Position </title>
+        <script src="http://maps.google.com/maps/api/js?key=KEY_API" type="text/javascript"></script>
+        <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+
+
+        <script type="text/javascript">
+            if (navigator.geolocation) {
+                checkGeolocationByHTML5();
+            } else {
+                checkGeolocationByLoaderAPI(); // HTML5 not supported! Fall back to Loader API.
+            }
+
+            function checkGeolocationByHTML5() {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    setMapCenter(position.coords.latitude, position.coords.longitude);
+                }, function () {
+                    checkGeolocationByLoaderAPI(); // Error! Fall back to Loader API.
+                });
+            }
+
+            function checkGeolocationByLoaderAPI() {
+                if (google.loader.ClientLocation) {
+                    setMapCenter(google.loader.ClientLocation.latitude, google.loader.ClientLocation.longitude);
+                } else {
+                    // Unsupported! Show error/warning?
+                }
+            }
+
+            function setMapCenter(latitude, longitude) {
+                geoMap.getMap().setCenter(new google.maps.LatLng(latitude, longitude));
+            }
+        </script>
+
+
+        <script type="text/javascript">
+            function geocode() {
+                PF('geoMap').geocode(document.getElementById('address').value);
+                console.log("geocode: " + document.getElementById('address').value);
+            }
+
+            function reverseGeocode(lat, lng) {
+                //var lat = document.getElementById('lat').value,
+                // lng = document.getElementById('lng').value;
+
+                PF('geoMap').reverseGeocode(lat, lng);
+            }
+
+        </script>
+    </ui:define>
+
+    <ui:define name="content_body" >
+        <h:form style="line-height: 5px !important;" class="Container100 "
+                prependId="false" id="fm">
+            <div class="Container100 ui-lesscurve">
+                <div class="Container50">
+                    <p:panelGrid columns="4" layout="grid"  style="border:0px !important; background:none;" styleClass="ui-panelgrid-blank">
+                       <p:commandButton value="Administrateur" icon="fa fa-user " styleClass="BlueButton" />
+                        <p:selectOneMenu value="#{organeBean.filtreCategorie}">
+                            <f:selectItem itemValue="1" itemLabel="Eglise"/>
+                            <f:selectItem itemValue="2" itemLabel="Mission"/>
+                            <f:selectItem itemValue="3" itemLabel="Autre"/>
+                            <p:ajax event="itemSelect" process="@this" update="@this"/>
+                        </p:selectOneMenu>
+                        <p:selectOneMenu value="#{organeBean.filtreEtat}" >
+                            <f:selectItem itemValue="1" itemLabel="Soumis"/>
+                            <f:selectItem itemValue="2" itemLabel="Validé"/>
+                            <f:selectItem itemValue="3" itemLabel="En attente"/>
+                            <p:ajax event="itemSelect" process="@this" update="@this"/>
+                        </p:selectOneMenu>
+                        <p:commandButton value="Filtrer" icon="fa fa-filter " styleClass="RedButton"
+                                         process="@form" update="@form"  actionListener="#{organeBean.listOrgane(true)}" />
+                        
+                       
+
+                    </p:panelGrid>
+                </div>
+
+                <div class="Container50">
+                    <p:panelGrid columns="4" layout="grid"  style="border:0px !important; background:none;" styleClass="ui-panelgrid-blank">
+
+                        <!--p:selectOneMenu >
+                            <f:selectItem itemValue="0" itemLabel="Catégorie"/>
+                            <f:selectItem itemValue="1" itemLabel="Eglise"/>
+                            <f:selectItem itemValue="2" itemLabel="ONG"/>
+                            <f:selectItem itemValue="3" itemLabel="Autre"/>
+                            <p:ajax event="itemSelect" process="@this" update="@this"/>
+                        </p:selectOneMenu>
+                        <p:spinner id="rayon"  placeholder="Rayon en Km" min="0" max="10" /-->
+
+                        <p:inputText style="width:350px" id="address" value="#{organeBean.recherche}"/>
+                        <p:outputLabel    />
+
+                        <p:commandButton value="Rechercher" icon="fa fa-search" styleClass="GreenButton" onclick="geocode()" type="button" process="@form"/>
+                    </p:panelGrid>
+                </div>
+            </div>
+
+            <div class="Container100">
+                <p:gmap id="geoGmap" widgetVar="geoMap" center="#{organeBean.centerGeoMap}" zoom="#{organeBean.zoom}" type="ROADMAP" 
+                        model="#{organeBean.geoModel}" style="width:100%;height:650px" onPointClick="handlePointClick(event);" >
+
+                    <p:ajax  event="geocode" listener="#{organeBean.onGeocode}" update="@form" />
+
+                    <p:ajax event="overlaySelect" listener="#{organeBean.onMarkerSelect}" />
+
+                    <p:gmapInfoWindow id="infoWindow">
+                        <p:panelGrid style="border:0px !important; background:none;" styleClass="ui-panelgrid-blank"
+                                     rendered="#{not empty organeBean.entite}">
+                            <f:facet name="header">
+                                <p:row>
+                                    <p:column colspan="3" >
+                                        <h5 class="BigTopic">
+                                            <p:outputLabel value="#{organeBean.entite.nom}" />
+                                        </h5>
+                                    </p:column>
+                                </p:row>
+                            </f:facet>
+                            <p:row>
+                                <p:column rowspan="9" >
+                                    <h:graphicImage name="images/temple.jpg" height="200" width="200" rendered="#{organeBean.entite.categorieOrgane == 1}" />
+                                    <h:graphicImage name="images/ong.jpg" height="200" width="200" rendered="#{organeBean.entite.categorieOrgane == 2}" />
+                                    <h:graphicImage name="images/indigitous.png" height="200" width="200" rendered="#{organeBean.entite.categorieOrgane == 3}" />
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>
+                                    <h:outputText value="Description:" />
+                                </p:column>
+                                <p:column>
+                                    <p:outputLabel value="#{organeBean.entite.description}" />
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>
+                                    <h:outputText value="Adresse:" />
+                                </p:column>
+                                <p:column>
+                                    <p:outputLabel value="#{organeBean.getAdress(organeBean.entite.lat,
+                                                            organeBean.entite.lng)}" />
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>
+                                    <h:outputText value="Latitude:" />
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{organeBean.entite.lat}" />
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column>
+                                    <h:outputText value="Longitude:" />
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{organeBean.entite.lng}" />
+                                </p:column>
+                            </p:row>
+
+                            <p:row>
+                                <p:column colspan="2">
+                                    <p:panelGrid columns="2" layout="grid" style="border:0px !important;
+                                                 background:none;" styleClass="ui-panelgrid-blank"
+                                                 >
+                                        <p:commandButton value="Valider" class="pull-right"
+                                                         styleClass="GreenButton" action="#{organeBean.activerOrgane(organeBean.entite)}" 
+                                                         process="@this" update="@form"
+                                                         rendered="#{organeBean.entite.etat != 2}">
+                                        </p:commandButton>
+                                        <p:commandButton  value="Attendre" class="pull-right"
+                                                          styleClass="OrangeButton" process="@this" update="@form" 
+                                                          action="#{organeBean.mettreEnAttente(organeBean.entite)}" 
+                                                          rendered="#{organeBean.entite.etat != 2}">
+                                        </p:commandButton>
+
+
+                                    </p:panelGrid>
+                                </p:column>
+                            </p:row>
+                        </p:panelGrid>
+
+
+                    </p:gmapInfoWindow>
+
+                </p:gmap>
+            </div>
+
+        </h:form>
+
+
+        <p:dialog widgetVar="dlg" showEffect="fade" header="Positionnement" 
+                  modal="true" closable="false" width="450">
+            <h:form prependId="false">
+                <p:panelGrid columns="2" layout="grid" style="border:0px !important; background:none;" styleClass="ui-panelgrid-blank">
+
+                    <h:outputLabel for="lat" value="Latitude" />
+                    <p:inputText id="lat" value="#{organeBean.organe.lat}" />
+
+                    <h:outputLabel for="lng" value="Longitude" />
+                    <p:inputText id="lng" value="#{organeBean.organe.lng}" />
+
+                    <h:outputLabel for="cat" value="Catégorie" />
+                    <p:selectOneMenu style="width: 100%;height: 25px;" id="type" value="#{organeBean.organe.categorieOrgane}">
+                        <f:selectItem itemValue="1" itemLabel="Eglise"/>
+                        <f:selectItem itemValue="2" itemLabel="Mission"/>
+                        <f:selectItem itemValue="3" itemLabel="Autre"/>
+                        <p:ajax event="itemSelect" process="@this" update="@this"/>
+                    </p:selectOneMenu>
+                    <h:outputLabel for="title" value="Dénomination:" />
+                    <p:inputText id="nom" value="#{organeBean.organe.nom}" />
+
+                    <h:outputLabel for="title" value="Description:" />
+                    <p:inputTextarea id="description" value="#{organeBean.organe.description}"  rows="3"/>
+
+                    <p:commandButton value="Ajouter" actionListener="#{organeBean.addMarker}" styleClass="GreenButton"
+                                     process="@form" update="@form" oncomplete="markerAddComplete()"  ajax="false"/>
+                    <p:commandButton value="Annuler" onclick="return cancel()"   styleClass="OrangeButton"/>
+                </p:panelGrid>
+
+                <!--h:inputHidden id="lat" value="#{organeBean.organe.lat}" />
+                <h:inputHidden id="lng" value="#{organeBean.organe.lng}" /-->
+            </h:form>
+        </p:dialog>
+
+        <script type="text/javascript">
+            var currentMarker = null;
+
+            function handlePointClick(event) {
+                if (currentMarker === null) {
+                    document.getElementById('lat').value = event.latLng.lat();
+                    document.getElementById('lng').value = event.latLng.lng();
+
+                    currentMarker = new google.maps.Marker({
+                        position: new google.maps.LatLng(event.latLng.lat(), event.latLng.lng())
+                    });
+
+                    PF('geoMap').addOverlay(currentMarker);
+
+                    PF('dlg').show();
+                }
+            }
+
+            function markerAddComplete() {
+                var title = document.getElementById('nom');
+                currentMarker.setTitle(title.value);
+                title.value = "";
+
+                currentMarker = null;
+                PF('dlg').hide();
+            }
+
+            function cancel() {
+                PF('dlg').hide();
+                currentMarker.setMap(null);
+                currentMarker = null;
+
+                return false;
+            }
+        </script>
+
+    </ui:define>
+
+</ui:composition>

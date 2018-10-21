@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<faces-config version="2.0" xmlns="http://java.sun.com/xml/ns/javaee"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd">
+    <application>
+        <locale-config>
+            <default-locale>fr</default-locale>
+        </locale-config>
+        <!--resource-bundle>
+            <base-name>Languages.messages</base-name>
+            <var>msg</var>
+        </resource-bundle>
+        <resource-bundle>
+            <base-name>Languages.core.auth.messages</base-name>
+            <var>auth</var>
+        </resource-bundle>
+        
+        <resource-bundle>
+            <base-name>Languages.ihm.messages</base-name>
+            <var>ihm</var>
+        </resource-bundle>
+        <resource-bundle>
+            <base-name>Languages.bi.messages</base-name>
+            <var>bi</var>
+        </resource-bundle>
+       
+        <resource-bundle>
+            <base-name>Languages.core.db.messages</base-name>
+            <var>db</var>
+        </resource-bundle-->
+    </application>
+    
+    <name>primefaces-ronin</name>
+    
+    <component>
+        <component-type>org.primefaces.component.RoninMenu</component-type>
+        <component-class>org.primefaces.ronin.component.menu.RoninMenu</component-class>
+    </component>
+    
+    <render-kit>
+        <renderer>
+            <component-family>org.primefaces.component</component-family>
+            <renderer-type>org.primefaces.component.RoninMenuRenderer</renderer-type>
+            <renderer-class>org.primefaces.ronin.component.menu.RoninMenuRenderer</renderer-class>
+        </renderer>
+    </render-kit>
+    
+</faces-config>

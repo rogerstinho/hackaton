@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="jadPU" transaction-type="JTA">
+    <jta-data-source>java:app/jdbc:postgresql:jad</jta-data-source>
+    <jar-file>lib/core-api-${project.version}.jar</jar-file>
+    <class>org.eadtogo.jad.entities.Groupe</class>
+    <class>org.eadtogo.jad.entities.Membre</class>
+    <class>org.eadtogo.jad.entities.Profession</class>
+    <class>com.ngs.core.entities.AccessCode</class>
+    <class>com.ngs.core.entities.AccessMode</class>
+    <class>com.ngs.core.entities.AuthCode</class>
+    <class>com.ngs.core.entities.AuthConfig</class>
+    <class>com.ngs.core.entities.Backup</class>
+    <class>com.ngs.core.entities.BackupSetting</class>
+    <class>com.ngs.core.entities.BackupType</class>
+    <class>com.ngs.core.entities.Fonctionnalite</class>
+    <class>com.ngs.core.entities.LogCategory</class>
+    <class>com.ngs.core.entities.LogEvent</class>
+    <class>com.ngs.core.entities.LogLevel</class>
+    <class>com.ngs.core.entities.Permission</class>
+    <class>com.ngs.core.entities.PermissionCategory</class>
+    <class>com.ngs.core.entities.Role</class>
+    <class>com.ngs.core.entities.User</class>
+    <class>com.ngs.core.entities.Variable</class>
+    <class>org.eadtogo.jad.entities.CategorieOrgane</class>
+    <class>org.eadtogo.jad.entities.Etat</class>
+    <class>org.eadtogo.jad.entities.Organe</class>
+    <class>org.eadtogo.jad.entities.Position</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <properties>
+      <property name="javax.persistence.schema-generation.database.action" value="create"/>
+    </properties>
+  </persistence-unit>
+</persistence>
